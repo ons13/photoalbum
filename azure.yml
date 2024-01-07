@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: photo-app-container
-        image: onsbhs/photo:1
+        image: onsbhs/photo:5
         ports:
         - containerPort: 8000
   strategy: 

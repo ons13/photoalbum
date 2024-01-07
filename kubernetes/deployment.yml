@@ -21,6 +21,6 @@ spec:
     spec:
       containers:
       - name: photo
-        image: onsbhs/photo:1
+        image: onsbhs/photo:5
         ports:
         - containerPort: 8000
