@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: photo-app-deployment
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: photo-app
+  template:
+    metadata:
+      labels:
+        app: photo-app
+    spec:
+      containers:
+      - name: photo-app-container
+        image: onsbhs/photo:1
+        ports:
+        - containerPort: 8000
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: photo-app-service
+spec:
+  selector:
+    app: photo-app
+  ports:
+    - protocol: TCP
+      port: 90
+      targetPort: 8000
+  type: LoadBalancer
+  

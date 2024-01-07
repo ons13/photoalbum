@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: photo-app
+  labels:
+    app: photo-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: photo-app
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: photo-app
+    spec:
+      containers:
+      - name: photo
+        image: onsbhs/photo:1
+        ports:
+        - containerPort: 8000
