@@ -10,4 +10,3 @@ spec:
     - port: 90
       targetPort: 8000
       nodePort: 30008
-      
