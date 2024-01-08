@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  labels:
+    app: tempo
+spec:
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+    spec:
+      containers:
+        - name: tempo
+          image: grafana/tempo
+          args:
+            - "-config.file=/haha/tempoconf.yaml"
+          ports:
+            - containerPort: 14268
+            - containerPort: 3200
+            - containerPort: 9095
+            - containerPort: 4317
+            - containerPort: 4318
+            - containerPort: 9411
+          volumeMounts:
+            - name: conf
+              mountPath: /haha/
+      volumes:
+        - name: conf
+          configMap:
+            name: tempoconfigfile
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo
+spec:
+  selector:
+    app: tempo
+  ports:
+    - protocol: TCP
+      port: 3200
+      targetPort: 3200
+      name: port-3200
+    - protocol: TCP
+      port: 14268
+      targetPort: 14268
+      name: port-14268 
+    - protocol: TCP
+      port: 9095
+      targetPort: 9095
+      name: port-9095 
+    - protocol: TCP
+      port: 4317
+      targetPort: 4317
+      name: port-4317
+    - protocol: TCP
+      port: 4318
+      targetPort: 4318
+      name: port-4318  
+    - protocol: TCP
+      port: 9411
+      targetPort: 9411
+      name: port-9411 
+
+

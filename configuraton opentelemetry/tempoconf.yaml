@@ -1,0 +1,92 @@
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:                           
+    jaeger:                            
+      protocols:                       
+        thrift_http:                   
+        grpc:                          
+        thrift_binary:
+        thrift_compact:
+    zipkin:
+    otlp:
+      protocols:
+        http:
+        grpc:
+    opencensus:
+
+metrics_generator:
+  processor:
+    service_graphs:
+      dimensions: []
+      histogram_buckets:
+      - 0.1
+      - 0.2
+      - 0.4
+      - 0.8
+      - 1.6
+      - 3.2
+      - 6.4
+      - 12.8
+      max_items: 10000
+      wait: 300s
+      workers: 10
+    span_metrics:
+      dimensions: []
+      histogram_buckets:
+      - 0.002
+      - 0.004
+      - 0.008
+      - 0.016
+      - 0.032
+      - 0.064
+      - 0.128
+      - 0.256
+      - 0.512
+      - 1.02
+      - 2.05
+      - 4.1
+  registry:
+    collection_interval: 15s
+    external_labels: {}
+    stale_duration: 15m
+  ring:
+    kvstore:
+      store: memberlist
+  storage:
+    path: /var/tempo/wal
+    remote_write:
+    - url: https://prometheus-smetest.apps.aps.lab/api/v1/write
+      tls_config:
+        insecure_skip_verify: true
+    remote_write_flush_deadline: 1m
+multitenancy_enabled: false
+overrides:
+  max_traces_per_user: 100000
+  metrics_generator_processors:
+  - service-graphs
+  - span-metrics
+
+
+ingester:
+  trace_idle_period: 10s               
+  max_block_bytes: 1_000_000           
+  max_block_duration: 5m               
+
+compactor:
+  compaction:
+    block_retention: 336h
+
+storage:
+  trace:
+    backend: local                     
+    block:
+      bloom_filter_false_positive: .05 
+    wal:
+      path: /tmp/tempo/wal             
+    local:
+      path: /tmp/tempo/blocks
+    pool:
+      max_workers: 100                 
+      queue_depth: 10000

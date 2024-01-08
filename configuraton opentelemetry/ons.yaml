@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otelcollector
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: opentelemetry
+      component: otel-collector
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+        component: otel-collector
+    spec:
+      containers:
+      - name: otel-collector-contrib
+        image: otel/opentelemetry-collector-contrib:0.74.0
+        ports:
+          - containerPort: 8888
+            name: metrics
+          - containerPort: 4317
+            name: grpc
+          - containerPort: 4318
+            name: http
+          - containerPort: 13133
+            name: health
+          - containerPort: 8889
+            name: prometheus
+
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2048Mi
+          requests:
+            cpu: 900m
+            memory: 1048Mi
+        volumeMounts:
+        - mountPath: /etc/otelcol-contrib
+          name: data
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: data
+        configMap:
+          name: otel-collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  ports:
+  - name: grpc # Default endpoint for OpenTelemetry receiver.
+    port: 4317
+  - name: http # Default endpoint for OpenTelemetry receiver.
+    port: 4318
+  - name: metrics # Default endpoint for querying metrics.
+    port: 8888
+  - name: health # Default endpoint for health checks.
+    port: 13133
+  - name: prometheus
+    port: 8889
